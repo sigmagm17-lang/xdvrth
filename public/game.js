@@ -2,10 +2,10 @@
 const $=id=>document.getElementById(id);
 const WORLD={width:960,floor:380};
 const keys={left:false,right:false,jump:false,dash:false,block:false};
-const A={ws:null,id:null,heroes:{},monsters:{},room:null,mode:1,chosen:'solis',screen:'menu',snapshot:null,localPositions:new Map(),fx:[],toastId:null,online:false,sound:true,soundContext:null,hitShake:0,roundStatus:'',didJoinFromURL:false,disconnects:0};
+const A={ws:null,id:null,heroes:{},monsters:{},room:null,mode:1,chosen:'gojo',screen:'menu',snapshot:null,localPositions:new Map(),fx:[],toastId:null,online:false,sound:true,soundContext:null,hitShake:0,roundStatus:'',didJoinFromURL:false,disconnects:0};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const COLOR={azure:'#78dfff',crimson:'#ff7e94'};
-const sessionName=()=>($('nickname').value||'').trim().replace(/[^\p{L}\p{N} _-]/gu,'').slice(0,14)||'VEXEL PLAYER';
+const sessionName=()=>($('nickname').value||'').trim().replace(/[^\p{L}\p{N} _-]/gu,'').slice(0,14)||'SORCERER';
 const send=(o)=>{if(A.ws&&A.ws.readyState===1){A.ws.send(JSON.stringify(o));return true;}notify('Offline — the server must be running.');return false;};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notify(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(A.toastId);A.toastId=setTimeout(()=>el.classList.remove('show'),3200);}
@@ -38,7 +38,7 @@ function onMessage(m){switch(m.type){
  }}
 function showOverlay(visible,eyebrow='',title='',subtitle='',rematch=false){$('gameOverlay').classList.toggle('hidden',!visible);if(!visible)return;$('overlayEyebrow').textContent=eyebrow;$('overlayTitle').textContent=title;$('overlayTitle').style.color=title.includes('CRIMSON')?COLOR.crimson:COLOR.azure;$('overlaySubtitle').textContent=subtitle;$('rematchBtn').classList.toggle('hidden',!rematch);}
 function renderRoom(){let r=A.room;if(!r)return;$('roomCode').textContent=r.code;$('gameRoomCode').textContent=r.code;$('lobbyMode').textContent=r.mode+'V'+r.mode;$('gameMode').textContent=r.mode+'V'+r.mode;
- const self=r.players.find(p=>p.id===A.id);if(self){A.chosen=self.hero;$('readyBtn').textContent=self.ready?'NOT READY ✕':'READY UP ✓';$('readyBtn').classList.toggle('secondary',self.ready);$('readyBtn').classList.toggle('primary',!self.ready);}
+ const self=r.players.find(p=>p.id===A.id);$('fillBotsBtn').disabled=r.host!==A.id||r.status!=='lobby'||r.players.length>=r.mode*2;if(self){A.chosen=self.hero;$('readyBtn').textContent=self.ready?'NOT READY ✕':'READY UP ✓';$('readyBtn').classList.toggle('secondary',self.ready);$('readyBtn').classList.toggle('primary',!self.ready);}
  for(const team of ['azure','crimson']){
  let arr=r.players.filter(x=>x.team===team),container=$(team+'Players');$(team+'Count').textContent=arr.length+'/'+r.mode;container.replaceChildren();for(let i=0;i<r.mode;i++){
  const row=document.createElement('div');row.className='player-slot'+(arr[i]?'':' empty');if(arr[i]){const p=arr[i],hero=A.heroes[p.hero];row.innerHTML='<span class="slot-num">'+String(i+1).padStart(2,'0')+'</span><span class="slot-name">'+esc(p.name)+(p.id===A.id?' ★':'')+'</span><span class="slot-hero">'+esc(hero?.name||p.hero)+'</span><span class="'+(p.ready?'slot-ready':'slot-wait')+'">'+(p.ready?'READY':'WAITING')+'</span>';}else row.innerHTML='<span class="slot-num">'+String(i+1).padStart(2,'0')+'</span><span class="slot-name">EMPTY SLOT</span><span class="slot-wait">—</span>';container.appendChild(row);
@@ -57,8 +57,9 @@ function drawRoster(){const box=$('roster');if(!Object.keys(A.heroes).length)ret
  }
  const hero=A.heroes[A.chosen];if(hero){$('selectedHero').textContent=hero.name.toUpperCase()+' • '+hero.role.toUpperCase();$('heroDetail').innerHTML='<strong>'+esc(hero.role.toUpperCase())+'</strong><span>① '+esc(hero.moves[0])+' &nbsp; ② '+esc(hero.moves[1])+' &nbsp; R '+esc(hero.ultimate)+'</span>';}
 }
-$('nickname').value=localStorage.getItem('vexelbound-name')||'VEXEL PLAYER';
-$('nickname').addEventListener('change',()=>{const name=sessionName();localStorage.setItem('vexelbound-name',name);if(A.online)send({type:'name',name});});
+$('fillBotsBtn').onclick=()=>send({type:'fillBots'});
+$('nickname').value=localStorage.getItem('jjk-private-fighter-name')||'SORCERER';
+$('nickname').addEventListener('change',()=>{const name=sessionName();localStorage.setItem('jjk-private-fighter-name',name);if(A.online)send({type:'name',name});});
 document.querySelectorAll('.mode-btn').forEach(b=>b.onclick=()=>{A.mode=Number(b.dataset.mode);document.querySelectorAll('.mode-btn').forEach(x=>x.classList.toggle('selected',x===b));$('modeHint').textContent=(A.mode*2)+' players';sound(400,.04);});
 function launch(type){if(!A.online)return notify('Server offline — start node server.js first.');send({type:'name',name:sessionName()});send({type,mode:A.mode,private:type==='create'});sound(330,.08);}
 $('quickBtn').onclick=()=>launch('quick');$('createBtn').onclick=()=>launch('create');$('practiceBtn').onclick=()=>{if(!A.online)return notify('Start the server to train against a monster.');send({type:'name',name:sessionName()});send({type:'practice'});};
@@ -91,7 +92,23 @@ const RGB=(s,a)=>s+(Math.round(a*255).toString(16).padStart(2,'0'));
 const rect=(c,x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));};
 function poly(c,pts,color){c.beginPath();c.moveTo(Math.round(pts[0][0]),Math.round(pts[0][1]));for(let i=1;i<pts.length;i++)c.lineTo(Math.round(pts[i][0]),Math.round(pts[i][1]));c.closePath();c.fillStyle=color;c.fill();}
 const darken=(hex,amount)=>{let s=hex.replace('#','');if(s.length!==6)return hex;const v=[0,2,4].map(i=>clamp(parseInt(s.slice(i,i+2),16)+amount,0,255).toString(16).padStart(2,'0'));return '#'+v.join('');};
-function drawFighter(ctx,p,t,size=2){const d=A.heroes[p.hero]||A.monsters[p.hero]||A.heroes.solis||{accent:'#72d9ff',shade:'#253655',hair:'#6a93be',skin:'#bc8d71',kit:'rift'};
+const JJK_SPRITES={};
+for(const id of [...Object.keys({gojo:1,yuji:1,megumi:1,todo:1,yuta:1,maki:1,nanami:1,nobara:1,hakari:1,kashimo:1,choso:1,toji:1,yuki:1,higuruma:1,mahito:1,jogo:1,hanami:1,sukuna:1,heian:1})]){
+  const im=new Image();im.src='/sprites/'+id+'.png';JJK_SPRITES[id]=im;
+}
+function drawFighter(ctx,p,t,size=2){
+ const im=JJK_SPRITES[p.hero];
+ if(im&&im.complete&&im.naturalWidth){
+   const running=Math.abs(p.vx||0)>18,jumping=(p.y||0)<WORLD.floor-4;
+   const ki=p.dead?28:p.hit?20:p.block||p.parry?19:p.attack?10+Math.floor(t/110)%3:jumping?21:running?4+Math.floor(t/125)%6:Math.floor(t/350)%4;
+   const sx=ki%6*116,sy=Math.floor(ki/6)*128;
+   ctx.save();ctx.translate(Math.round(p.x||0),Math.round(p.y||0));ctx.scale((p.face||1)*size*.58,size*.58);
+   if(p.buff){ctx.globalAlpha=.34;ctx.fillStyle='#cc9bff';for(let j=0;j<4;j++)ctx.fillRect(-44+j*24,-123,8,115);ctx.globalAlpha=1;}
+   if(p.hit)ctx.globalAlpha=.63;
+   ctx.drawImage(im,sx,sy,116,128,-58,-128,116,128);ctx.restore();
+   return;
+ }
+const d=A.heroes[p.hero]||A.monsters[p.hero]||A.heroes.gojo||{accent:'#72d9ff',shade:'#253655',hair:'#6a93be',skin:'#bc8d71',kit:'rift'};
  if(d.kit==='monster')return drawMonster(ctx,p,t,size,d);
  const x=p.x||0,y=p.y||0,act=!!p.attack,run=Math.abs(p.vx||0)>50,wave=run?Math.sin(t*.015):Math.sin(t*.003)*.35,jump=y<WORLD.floor-10,block=!!p.block,hit=!!p.hit,parry=!!p.parry,bruiser=d.kit==='swap'||d.kit==='stone',armor=d.kit==='stone';
  const coat=d.shade,edge=darken(coat,-21),bright=darken(coat,22),energy=d.accent;
@@ -182,7 +199,7 @@ function buildBackground(theme='night'){let off=document.createElement('canvas')
  backgrounds[theme]=off;
 }
 buildBackground('night');
-function paintMenu(){let t=Date.now();mg.clearRect(0,0,460,270);mg.save();mg.scale(.48,.48);mg.drawImage(backgrounds.night,0,0);mg.restore();const pts=[{hero:'solis',x:143,y:236,face:1},{hero:'ember',x:319,y:239,face:-1},{hero:'atlas',x:396,y:257,face:-1}];for(let p of pts)drawFighter(mg,p,t,2.75);mg.strokeStyle='#82d9ff';mg.lineWidth=3;mg.beginPath();mg.arc(246,145,40,-.4,1.6);mg.stroke();}
+function paintMenu(){let t=Date.now();mg.clearRect(0,0,460,270);mg.save();mg.scale(.48,.48);mg.drawImage(backgrounds.night,0,0);mg.restore();const pts=[{hero:'gojo',x:143,y:236,face:1},{hero:'yuji',x:319,y:239,face:-1},{hero:'todo',x:396,y:257,face:-1}];for(let p of pts)drawFighter(mg,p,t,2.75);mg.strokeStyle='#82d9ff';mg.lineWidth=3;mg.beginPath();mg.arc(246,145,40,-.4,1.6);mg.stroke();}
 function addFX(m){let x=m.x||0,y=m.y||0;for(let i=0;i<13;i++){const th=Math.random()*Math.PI*2,sp=25+Math.random()*100;A.fx.push({x,y,vx:Math.cos(th)*sp,vy:Math.sin(th)*sp,born:performance.now(),dur:250+Math.random()*220,color:m.kind==='parry'?'#a8eaff':m.kind==='ultimate'?'#ffc6ed':'#ffe8aa'});}if(A.fx.length>170)A.fx.splice(0,A.fx.length-170);}
 function drawBG(ctx){ctx.drawImage(backgrounds.night,0,0);}
 function hud(ctx,snap){const ps=snap.players||[],azure=ps.filter(p=>p.team==='azure'),crimson=ps.filter(p=>p.team==='crimson');

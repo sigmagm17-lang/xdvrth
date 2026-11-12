@@ -1,11 +1,7 @@
 services:
   - type: web
-    name: vexelbound-online
+    name: jjk-pixel-clash
     runtime: node
     plan: free
     buildCommand: echo "No dependencies"
     startCommand: node server.js
-    healthCheckPath: /health
-    envVars:
-      - key: NODE_ENV
-        value: production

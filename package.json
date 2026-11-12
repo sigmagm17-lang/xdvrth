@@ -1,8 +1,8 @@
 {
-  "name": "vexelbound-online",
-  "version": "0.9.0",
+  "name": "jjk-pixel-cursed-clash",
+  "version": "1.0.0",
   "private": true,
-  "description": "Original pixel-art online arena fighter: 1v1, 2v2, 3v3 with room codes and server-authoritative combat",
+  "description": "Fan-made browser pixel fighter with story, bots, multiplayer 1v1/2v2/3v3.",
   "scripts": {
     "start": "node server.js",
     "test": "node tests/run-tests.js"

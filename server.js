@@ -7,26 +7,14 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const PORT=Number(process.env.PORT||3000);
 const ROOT=path.resolve(__dirname,'public');
+
 const TICK_MS=33;
 const WORLD={width:960,floor:380};
 const TEAMS=['azure','crimson'];
-const HEROES={
-  solis:{name:'Solis',role:'Rift Weaver',hp:110,speed:230,damage:11,accent:'#72d9ff',shade:'#2b3b72',skin:'#c19d87',hair:'#193255',kit:'rift',moves:['Rift Spear','Phase Rush'],ultimate:'Event Horizon'},
-  ember:{name:'Ember',role:'Flame Brawler',hp:135,speed:219,damage:13,accent:'#ff9c5b',shade:'#862d36',skin:'#b77c5d',hair:'#ae4b2c',kit:'flame',moves:['Fireball','Inferno Step'],ultimate:'Phoenix Break'},
-  noct:{name:'Noct',role:'Shadow Caller',hp:105,speed:250,damage:10,accent:'#ab91ff',shade:'#292144',skin:'#8f6a62',hair:'#302e54',kit:'shadow',moves:['Shadow Fang','Umbral Dash'],ultimate:'Nightfall'},
-  atlas:{name:'Atlas',role:'Clap Vanguard',hp:170,speed:211,damage:15,accent:'#63ffd0',shade:'#2e6760',skin:'#9e6645',hair:'#17292a',kit:'swap',moves:['Clap Shift','Titan Elbow'],ultimate:'Brotherhood Rush'},
-  rook:{name:'Rook',role:'Blade Warden',hp:120,speed:239,damage:12,accent:'#d6e2ff',shade:'#52576a',skin:'#a17d69',hair:'#55545b',kit:'blade',moves:['Wind Cutter','Draw Step'],ultimate:'Thousand Edges'},
-  volt:{name:'Volt',role:'Storm Spear',hp:115,speed:253,damage:10,accent:'#8ffaff',shade:'#27547e',skin:'#bd8f7e',hair:'#70b7be',kit:'bolt',moves:['Spark Lance','Thunder Dash'],ultimate:'Storm Surge'},
-  fortune:{name:'Fortune',role:'Lucky Bruiser',hp:150,speed:215,damage:12,accent:'#f2c65d',shade:'#614467',skin:'#bc886c',hair:'#e0c379',kit:'luck',moves:['Gold Gates','Lucky Swing'],ultimate:'Lucky Seven'},
-  verdant:{name:'Verdant',role:'Vine Alchemist',hp:115,speed:229,damage:10,accent:'#9def91',shade:'#3c684f',skin:'#b18d6b',hair:'#62835a',kit:'vine',moves:['Thorn Dart','Vine Leap'],ultimate:'Wild Bloom'},
-  aegis:{name:'Aegis',role:'Stone Guardian',hp:185,speed:195,damage:14,accent:'#e4b486',shade:'#69554f',skin:'#b49a88',hair:'#4d474d',kit:'stone',moves:['Stone Shot','Bulwark Charge'],ultimate:'Meteor Fist'},
-  frost:{name:'Frost',role:'Ice Duelist',hp:117,speed:232,damage:11,accent:'#a6ddff',shade:'#536681',skin:'#ecc8b3',hair:'#e5fbff',kit:'ice',moves:['Shard Volley','Frost Step'],ultimate:'Glacial Crown'},
-  prism:{name:'Prism',role:'Light Shaper',hp:108,speed:237,damage:11,accent:'#ffd5f8',shade:'#80528d',skin:'#b78a7c',hair:'#cf8fc0',kit:'light',moves:['Star Needle','Flash Step'],ultimate:'Solar Bloom'},
-  gale:{name:'Gale',role:'Sky Striker',hp:124,speed:260,damage:11,accent:'#e5ff8d',shade:'#526e60',skin:'#ad806b',hair:'#7f9961',kit:'wind',moves:['Gale Blade','Cyclone Dash'],ultimate:'Skyfall'}
-};
+const HEROES={"gojo":{"name":"Satoru Gojo","role":"Infinity","hp":110,"speed":230,"damage":11,"accent":"#70d8ff","shade":"#22253f","skin":"#e4b699","hair":"#eef8ff","kit":"rift","moves":["Blue","Red"],"ultimate":"Hollow Purple"},"yuji":{"name":"Yuji Itadori","role":"Black Flash","hp":142,"speed":235,"damage":13,"accent":"#fa738d","shade":"#252b43","skin":"#d99b86","hair":"#df8796","kit":"flame","moves":["Divergent Fist","Black Flash"],"ultimate":"Soul Strike"},"megumi":{"name":"Megumi Fushiguro","role":"Ten Shadows","hp":114,"speed":239,"damage":10,"accent":"#96a4e9","shade":"#21283e","skin":"#cdad91","hair":"#101a31","kit":"shadow","moves":["Divine Dogs","Nue"],"ultimate":"Shadow Garden"},"todo":{"name":"Aoi Todo","role":"Boogie Woogie","hp":170,"speed":211,"damage":15,"accent":"#f8bb83","shade":"#3b2c4b","skin":"#b17a5f","hair":"#202031","kit":"swap","moves":["Boogie Woogie","Clap Smash"],"ultimate":"Brother Beatdown"},"yuta":{"name":"Yuta Okkotsu","role":"Rika","hp":128,"speed":235,"damage":12,"accent":"#d2bdff","shade":"#31303d","skin":"#d9b5a5","hair":"#111822","kit":"blade","moves":["Cursed Slash","Rika Rush"],"ultimate":"Love Beam"},"maki":{"name":"Maki Zenin","role":"Weapons Expert","hp":132,"speed":240,"damage":12,"accent":"#b6f4ae","shade":"#253549","skin":"#c6a387","hair":"#143a31","kit":"blade","moves":["Soul Katana","Weapon Rush"],"ultimate":"Heavenly Restriction"},"nanami":{"name":"Kento Nanami","role":"Ratio","hp":136,"speed":220,"damage":13,"accent":"#f1d09a","shade":"#615346","skin":"#dcb89e","hair":"#d6c0a0","kit":"stone","moves":["Ratio Strike","Precision Rush"],"ultimate":"Overtime"},"nobara":{"name":"Nobara Kugisaki","role":"Straw Doll","hp":118,"speed":230,"damage":11,"accent":"#e79e75","shade":"#343b53","skin":"#dfb59b","hair":"#b87b4f","kit":"light","moves":["Nail Barrage","Resonance"],"ultimate":"Hairpin"},"hakari":{"name":"Kinji Hakari","role":"Jackpot","hp":153,"speed":220,"damage":13,"accent":"#e3d08b","shade":"#28263a","skin":"#cba88a","hair":"#eacb96","kit":"luck","moves":["Shutter Doors","Fever Rush"],"ultimate":"Jackpot"},"kashimo":{"name":"Hajime Kashimo","role":"Lightning","hp":120,"speed":256,"damage":11,"accent":"#87f1ff","shade":"#343044","skin":"#d4b79c","hair":"#d2f7ff","kit":"bolt","moves":["Lightning Spear","Thunder Rush"],"ultimate":"Mythical Beast"},"choso":{"name":"Choso","role":"Blood Manipulation","hp":127,"speed":226,"damage":12,"accent":"#e16c8c","shade":"#3f284a","skin":"#ceb0a3","hair":"#3e2228","kit":"vine","moves":["Piercing Blood","Blood Rush"],"ultimate":"Blood Storm"},"toji":{"name":"Toji Fushiguro","role":"Heavenly Restriction","hp":154,"speed":246,"damage":14,"accent":"#c8b7b3","shade":"#20332f","skin":"#cca58d","hair":"#171a21","kit":"blade","moves":["Spear Strike","Superhuman Dash"],"ultimate":"Weapon Barrage"},"yuki":{"name":"Yuki Tsukumo","role":"Star Rage","hp":146,"speed":223,"damage":14,"accent":"#f9d69c","shade":"#3c3456","skin":"#e3c0a8","hair":"#f6d48a","kit":"stone","moves":["Mass Strike","Garuda Charge"],"ultimate":"Black Hole"},"higuruma":{"name":"Hiromi Higuruma","role":"Judgeman","hp":132,"speed":226,"damage":12,"accent":"#e5c9be","shade":"#3d373a","skin":"#d0b09c","hair":"#382c31","kit":"blade","moves":["Gavel Strike","Judgement"],"ultimate":"Deadly Sentencing"}};
 const PUBLIC_HEROES=Object.fromEntries(Object.entries(HEROES).map(([k,v])=>[k,{...v}]));
 // Non-playable monsters are only used for solo training / future story encounters.
-const MONSTERS={wraith:{name:'Fang Wraith',role:'Rift Monster',hp:180,speed:190,damage:12,accent:'#ff618f',shade:'#231a36',skin:'#5a4d74',hair:'#160f25',kit:'monster',moves:['Claw Rend','Fang Rush'],ultimate:'Abyssal Howl'}};
+const MONSTERS={"mahito":{"name":"Mahito","role":"Cursed Spirit · ENEMY ONLY","hp":195,"speed":207,"damage":12,"accent":"#e27ab9","shade":"#33283a","skin":"#d1b6a9","hair":"#aac1c8","kit":"monster","moves":["Soul Touch","Transfiguration"],"ultimate":"Domain Expansion"},"jogo":{"name":"Jogo","role":"Cursed Spirit · ENEMY ONLY","hp":195,"speed":190,"damage":12,"accent":"#fdb171","shade":"#382336","skin":"#b38e7a","hair":"#a35546","kit":"monster","moves":["Lava","Fire"],"ultimate":"Coffin"},"hanami":{"name":"Hanami","role":"Cursed Spirit · ENEMY ONLY","hp":190,"speed":192,"damage":12,"accent":"#b0d888","shade":"#283d3c","skin":"#94a58f","hair":"#a4dfb7","kit":"monster","moves":["Roots","Wood"],"ultimate":"Bloom"},"sukuna":{"name":"Sukuna","role":"King of Curses · ENEMY ONLY","hp":225,"speed":231,"damage":14,"accent":"#fa6379","shade":"#3c1c29","skin":"#d7a397","hair":"#e59bb3","kit":"monster","moves":["Dismantle","Cleave"],"ultimate":"Shrine"},"heian":{"name":"Heian-era Sukuna","role":"FINAL BOSS · ENEMY ONLY","hp":310,"speed":233,"damage":16,"accent":"#f75b6b","shade":"#3a1a2c","skin":"#d7a397","hair":"#f6a8b7","kit":"monster","moves":["Four Arms","World Slash"],"ultimate":"Malevolent Shrine"}};
 Object.assign(HEROES,MONSTERS);
 const rooms=new Map(); const peers=new Set();
 const rand=()=>crypto.randomInt(1_000_000);
@@ -36,8 +24,13 @@ function json(res,code,obj){res.writeHead(code,{'Content-Type':'application/json
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.ico':'image/x-icon','.json':'application/json'};
 const server=http.createServer((req,res)=>{
   let pathname;try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{return json(res,400,{error:'Invalid URL'});}
+  if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});return res.end('User-agent: *\nAllow: /\n');}
+  if(pathname==='/story'||pathname==='/story/'){
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+    return fs.createReadStream(path.resolve(__dirname,'JJK_Pixel_Cursed_Clash_Private_V10.html')).pipe(res);
+  }
   if(pathname==='/health')return json(res,200,{ok:true,rooms:rooms.size,players:[...peers].filter(p=>p.room).length});
-  if(pathname==='/api/config')return json(res,200,{heroes:PUBLIC_HEROES,monsters:MONSTERS,version:'vexelbound-v9',world:WORLD});
+  if(pathname==='/api/config')return json(res,200,{heroes:PUBLIC_HEROES,monsters:MONSTERS,version:'jjk-v10-public',world:WORLD});
   let full=path.resolve(ROOT,'.'+(pathname==='/'?'/index.html':pathname));
   if(!full.startsWith(ROOT+path.sep))return json(res,403,{error:'Forbidden'});
   fs.stat(full,(err,st)=>{
@@ -71,7 +64,7 @@ server.on('upgrade',(req,sock,head)=>{
   if(req.headers.origin){try{if(new URL(req.headers.origin).host!==req.headers.host){sock.destroy();return;}}catch{sock.destroy();return;}}
   const key=req.headers['sec-websocket-key'];if(Buffer.from(key,'base64').length!==16){sock.destroy();return;}
   const expected=crypto.createHash('sha1').update(key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest('base64');
-  sock.write('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: '+expected+'\r\n\r\n');const p=new Peer(sock);peers.add(p);p.send({type:'welcome',id:p.playerId,heroes:PUBLIC_HEROES,monsters:MONSTERS,version:'vexelbound-v9'});if(head.length)p.handleData(head);
+  sock.write('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: '+expected+'\r\n\r\n');const p=new Peer(sock);peers.add(p);p.send({type:'welcome',id:p.playerId,heroes:PUBLIC_HEROES,monsters:MONSTERS,version:'jjk-v10-public'});if(head.length)p.handleData(head);
 });
 function code(){let c;do{c=crypto.randomBytes(5).toString('hex').slice(0,6).toUpperCase();}while(rooms.has(c));return c;}
 function roomPublic(r){return {code:r.code,mode:r.mode,private:r.private,status:r.status,host:r.host,players:[...r.players.values()].map(p=>({id:p.id,name:p.name,hero:p.hero,team:p.team,ready:p.ready,connected:!p.peer.closed})),score:r.score,round:r.round};}
@@ -81,7 +74,7 @@ function tell(p,message){p.send({type:'notice',message});}
 function error(p,message){p.send({type:'error',message});}
 function makeRoom(p,mode,priv){if(p.room)leave(p);if(rooms.size>250)return error(p,'Server is busy. Try again later.');mode=Number(mode);if(![1,2,3].includes(mode))return error(p,'Choose 1v1, 2v2, or 3v3.');let r={code:code(),mode,private:priv,players:new Map(),host:p.playerId,status:'lobby',score:{azure:0,crimson:0},round:1,lastTick:0,frame:0,projectiles:[],fx:[],endAt:0,resetAt:0,winner:null};rooms.set(r.code,r);add(r,p);}
 function add(r,peer){if(peer.room)leave(peer);if(r.status!=='lobby')return error(peer,'This match already started.');if(r.players.size>=r.mode*2)return error(peer,'That room is full.');
-  let a=[...r.players.values()].filter(p=>p.team==='azure').length,b=r.players.size-a;let team=a<=b?'azure':'crimson';let player={id:peer.playerId,name:peer.displayName||'RIFT-'+rand().toString().slice(-4),hero:'solis',team,ready:false,peer,x:0,y:WORLD.floor,vx:0,vy:0,face:team==='azure'?1:-1,hp:1,energy:100,block:false,parryUntil:0,stun:0,hitUntil:0,dashUntil:0,invuln:0,combo:0,lastAttack:0,atkAt:0,heavyAt:0,skillAt:0,skill2At:0,ultAt:0,blocks:0,ko:0,inputs:{},buffUntil:0};r.players.set(player.id,player);peer.room=r;peer.send({type:'joined',code:r.code,id:player.id});sendRoom(r);}
+  let a=[...r.players.values()].filter(p=>p.team==='azure').length,b=r.players.size-a;let team=a<=b?'azure':'crimson';let player={id:peer.playerId,name:peer.displayName||'RIFT-'+rand().toString().slice(-4),hero:'gojo',team,ready:false,peer,x:0,y:WORLD.floor,vx:0,vy:0,face:team==='azure'?1:-1,hp:1,energy:100,block:false,parryUntil:0,stun:0,hitUntil:0,dashUntil:0,invuln:0,combo:0,lastAttack:0,atkAt:0,heavyAt:0,skillAt:0,skill2At:0,ultAt:0,blocks:0,ko:0,inputs:{},buffUntil:0};r.players.set(player.id,player);peer.room=r;peer.send({type:'joined',code:r.code,id:player.id});sendRoom(r);}
 function leave(peer){let r=peer.room;if(!r)return;peer.room=null;r.players.delete(peer.playerId);if(r.practice){rooms.delete(r.code);return;}
   if(!r.players.size){rooms.delete(r.code);return;}
   if(r.host===peer.playerId)r.host=r.players.keys().next().value;
@@ -98,8 +91,8 @@ function receive(peer,msg){const t=String(msg.type||'');if(t==='name'){peer.disp
    if(peer.room)leave(peer);
    makeRoom(peer,1,true);const r=peer.room;if(!r)return;
    r.practice=true;
-   const botPeer={playerId:'monster-'+crypto.randomUUID(),displayName:'FANG WRAITH',room:null,closed:false,send(){}};
-   add(r,botPeer);const b=r.players.get(botPeer.playerId);b.hero='wraith';b.name='FANG WRAITH';b.bot=true;b.faction='curse';
+   const botPeer={playerId:'monster-'+crypto.randomUUID(),displayName:'MAHITO',room:null,closed:false,send(){}};
+   add(r,botPeer);const b=r.players.get(botPeer.playerId);b.hero='mahito';b.name='MAHITO';b.bot=true;b.faction='curse';
    const human=r.players.get(peer.playerId);human.team='azure';human.ready=true;b.team='crimson';b.ready=true;
    start(r);return;
  }
@@ -109,7 +102,20 @@ function receive(peer,msg){const t=String(msg.type||'');if(t==='name'){peer.disp
  if(t==='join'){const c=String(msg.code||'').toUpperCase().trim();const r=rooms.get(c);if(!r)return error(peer,'Room not found. Ask your friend for a fresh code.');return add(r,peer);}
  if(t==='leave'){leave(peer);peer.send({type:'left'});return;}
  const r=peer.room;if(!r)return error(peer,'Join a room first.');const p=r.players.get(peer.playerId);if(!p)return;
- if(t==='choose'&&r.status==='lobby'){if(!HEROES[msg.hero])return error(peer,'Unknown fighter');p.hero=msg.hero;p.ready=false;sendRoom(r);return;}
+ if(t==='fillBots'&&r.status==='lobby'){
+   if(peer.playerId!==r.host)return error(peer,'Only the room host can add bots');
+   const ids=['yuji','gojo','megumi','todo','maki','yuta','nobara','kashimo','toji','hakari'];
+   while(r.players.size<r.mode*2){
+     const ix=r.players.size;
+     const bPeer={playerId:'cpu-'+crypto.randomUUID(),displayName:'CPU',room:null,closed:false,send(){}};
+     add(r,bPeer);const b=r.players.get(bPeer.playerId);
+     b.bot=true;b.hero=ids[ix%ids.length];b.name='BOT '+(HEROES[b.hero]?.name||'SORCERER');b.ready=true;
+   }
+   sendRoom(r);const ps=[...r.players.values()],az=ps.filter(x=>x.team==='azure'),cr=ps.filter(x=>x.team==='crimson');
+   if(az.length===r.mode&&cr.length===r.mode&&ps.every(x=>x.ready))start(r);
+   return;
+ }
+ if(t==='choose'&&r.status==='lobby'){if(!PUBLIC_HEROES[msg.hero])return error(peer,'Unknown fighter');p.hero=msg.hero;p.ready=false;sendRoom(r);return;}
  if(t==='team'&&r.status==='lobby'){let team=msg.team;if(!TEAMS.includes(team))return;const count=[...r.players.values()].filter(x=>x.team===team).length;if(count>=r.mode)return error(peer,'That team is full.');p.team=team;p.ready=false;sendRoom(r);return;}
  if(t==='ready'&&r.status==='lobby'){p.ready=Boolean(msg.ready);sendRoom(r);const ps=[...r.players.values()],blue=ps.filter(x=>x.team==='azure'),red=ps.filter(x=>x.team==='crimson');if(ps.length===r.mode*2&&blue.length===r.mode&&red.length===r.mode&&ps.every(x=>x.ready))start(r);return;}
  if(t==='rematch'&&r.status==='ended'){if(r.practice){r.round=1;r.score={azure:0,crimson:0};start(r);return;}r.status='lobby';r.score={azure:0,crimson:0};r.round=1;r.projectiles=[];for(let x of r.players.values())x.ready=false;sendRoom(r);return;}
@@ -157,7 +163,7 @@ function action(r,p,act){const now=Date.now(),d=HEROES[p.hero];if(p.hp<=0||now<p
 function updateRoom(r,dt){const now=Date.now();if(r.status!=='fight')return;
  for(const p of r.players.values()){
    const d=HEROES[p.hero];if(p.hp<=0)continue;
-   if(p.bot){const human=[...r.players.values()].find(v=>!v.bot&&v.hp>0);if(human){const dist=human.x-p.x;p.face=Math.sign(dist)||p.face;p.inputs={left:dist < -72,right:dist > 72,jump:false,dash:Math.abs(dist)>240,block:Math.abs(dist)<100&&Math.random()<.08};if(Math.abs(dist)<93&&now-(p.lastBotAttack||0)>920){p.lastBotAttack=now;action(r,p,'punch');}if(Math.abs(dist)<420&&now-(p.lastBotSkill||0)>4700){p.lastBotSkill=now;action(r,p,'skill1');}}}
+   if(p.bot){const human=[...r.players.values()].filter(v=>v.team!==p.team&&v.hp>0).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];if(human){const dist=human.x-p.x;p.face=Math.sign(dist)||p.face;p.inputs={left:dist < -72,right:dist > 72,jump:false,dash:Math.abs(dist)>240,block:Math.abs(dist)<100&&Math.random()<.08};if(Math.abs(dist)<93&&now-(p.lastBotAttack||0)>920){p.lastBotAttack=now;action(r,p,'punch');}if(Math.abs(dist)<420&&now-(p.lastBotSkill||0)>4700){p.lastBotSkill=now;action(r,p,'skill1');}}}
 
    const input=p.inputs||{};p.block=!!input.block&&now>=p.stun;
    if(p.block&&!p._wasBlock)p.parryUntil=now+175;p._wasBlock=p.block;
@@ -195,5 +201,5 @@ let prev=Date.now();setInterval(()=>{
 },TICK_MS).unref();
 // Heartbeats and cleanup of closed / abandoned lobby instances.
 setInterval(()=>{for(const p of peers){if(Date.now()-p.lastSeen>65_000)p.close();else if(!p.closed)p.frame(9,Buffer.alloc(0));}for(const [c,r] of rooms){if(!r.players.size)rooms.delete(c);}},15000).unref();
-server.listen(PORT,'0.0.0.0',()=>console.log('Vexelbound Online listening on http://localhost:'+PORT));
+server.listen(PORT,'0.0.0.0',()=>console.log('JJK Public Arena listening on http://localhost:'+PORT));
 module.exports={server,rooms,HEROES};
